@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Simulador de planos de assinatura para barbearias - ADPG">
+<title>Simulador de Assinatura ADPG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+/* ─────────────────────────  TOKENS  ───────────────────────── */
+:root{
+  --bg:#EFF2F3;
+  --surface:#FFFFFF;
+  --surface-2:#E5EAEC;
+  --surface-3:#DBE2E4;
+  --ink:#101819;
+  --ink-2:#485A60;
+  --ink-3:#7A8B91;
+  --line:#D1DADD;
+  --line-strong:#B6C3C7;
+  --accent:#1D5D74;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#DAE8ED;
+  --ok:#0D7A52;
+  --ok-soft:#D8ECE3;
+  --warn:#A96A0D;
+  --warn-soft:#F5E7CE;
+  --bad:#AE322C;
+  --bad-soft:#F6DCDA;
+  --shadow:0 1px 2px rgba(16,24,25,.06),0 8px 24px -12px rgba(16,24,25,.18);
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1315;
+    --surface:#151E21;
+    --surface-2:#1D282C;
+    --surface-3:#253338;
+    --ink:#E7EEF0;
+    --ink-2:#A2B2B8;
+    --ink-3:#74868D;
+    --line:#293539;
+    --line-strong:#3A4A50;
+    --accent:#6BB4CE;
+    --accent-ink:#08171D;
+    --accent-soft:#153039;
+    --ok:#43C08C;
+    --ok-soft:#122C24;
+    --warn:#E0A63C;
+    --warn-soft:#2E2515;
+    --bad:#EC7167;
+    --bad-soft:#331A19;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1315;
+  --surface:#151E21;
+  --surface-2:#1D282C;
+  --surface-3:#253338;
+  --ink:#E7EEF0;
+  --ink-2:#A2B2B8;
+  --ink-3:#74868D;
+  --line:#293539;
+  --line-strong:#3A4A50;
+  --accent:#6BB4CE;
+  --accent-ink:#08171D;
+  --accent-soft:#153039;
+  --ok:#43C08C;
+  --ok-soft:#122C24;
+  --warn:#E0A63C;
+  --warn-soft:#2E2515;
+  --bad:#EC7167;
+  --bad-soft:#331A19;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.num{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+.disp{font-family:"Big Shoulders Display","IBM Plex Sans",sans-serif;font-weight:800;letter-spacing:.01em;line-height:.95}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* ─────────────────────────  SHELL  ───────────────────────── */
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px 72px}
+
+header.top{
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+  margin-bottom:28px;
+}
+.top-in{max-width:1240px;margin:0 auto;padding:22px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.pole{
+  width:8px;align-self:stretch;min-height:52px;border-radius:4px;
+  background:repeating-linear-gradient(150deg,var(--accent) 0 6px,var(--surface-3) 6px 12px);
+}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand .eyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.brand h1{margin:0;font-size:clamp(30px,4.4vw,44px)}
+.brand h1 .disp{display:inline}
+.top-note{
+  margin-left:auto;max-width:300px;font-size:12.5px;color:var(--ink-2);
+  border-left:2px solid var(--line-strong);padding-left:12px;
+}
+
+/* ─────────────────────────  LAYOUT  ───────────────────────── */
+.grid{display:grid;grid-template-columns:340px minmax(0,1fr);gap:26px;align-items:start}
+@media (max-width:960px){.grid{grid-template-columns:1fr}}
+
+aside.panel{position:sticky;top:16px;display:flex;flex-direction:column;gap:16px}
+@media (max-width:960px){aside.panel{position:static}}
+.results{display:flex;flex-direction:column;gap:22px;min-width:0}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+}
+.card-pad{padding:18px}
+
+.step-head{display:flex;align-items:baseline;gap:9px;padding:14px 18px 0}
+.step-n{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;
+  color:var(--accent-ink);background:var(--accent);
+  width:19px;height:19px;display:grid;place-items:center;border-radius:5px;flex:none;
+  transform:translateY(2px);
+}
+.step-head h2{margin:0;font-size:15px;font-weight:600;letter-spacing:-.01em}
+
+/* ─────────────────────────  FIELDS  ───────────────────────── */
+.fields{display:flex;flex-direction:column;gap:13px;padding:14px 18px 18px}
+.field label{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:5px;font-weight:500}
+.inputbox{
+  display:flex;align-items:center;gap:0;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  transition:border-color .12s,background .12s;
+}
+.inputbox:focus-within{border-color:var(--accent);background:var(--surface)}
+.inputbox .pre,.inputbox .suf{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3);
+  padding:0 10px;flex:none;user-select:none;
+}
+.inputbox input{
+  flex:1;min-width:0;border:0;background:transparent;color:var(--ink);
+  font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:16px;font-weight:500;padding:9px 4px 9px 0;text-align:right;
+}
+.inputbox input::-webkit-outer-spin-button,.inputbox input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.inputbox input[type=number]{-moz-appearance:textfield}
+
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;background:transparent;margin:9px 0 0;
+}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--surface-3)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--surface-3)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--surface);margin-top:-6px;cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;background:var(--accent);
+  border:2px solid var(--surface);cursor:pointer;
+}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline}
+.slider-val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--ink)}
+
+/* stepper */
+.stepper{display:flex;align-items:stretch;gap:6px}
+.stepper button{
+  font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;
+  background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line);
+  border-radius:8px;width:34px;cursor:pointer;transition:.12s;
+}
+.stepper button:hover:not(:disabled){background:var(--surface-3);color:var(--ink)}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.segs{display:flex;flex:1;gap:4px}
+.segs button{
+  flex:1;width:auto;font-size:14px;padding:9px 0;
+}
+.segs button[aria-pressed="true"]{
+  background:var(--accent);border-color:var(--accent);color:var(--accent-ink);
+}
+
+/* ─────────────────────────  VERDICT  ───────────────────────── */
+.verdict{
+  display:flex;gap:14px;align-items:flex-start;padding:16px 18px;
+  border-radius:var(--radius);border:1px solid;
+}
+.verdict.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ink)}
+.verdict.warn{background:var(--warn-soft);border-color:var(--warn)}
+.verdict.bad{background:var(--bad-soft);border-color:var(--bad)}
+.dot{width:11px;height:11px;border-radius:50%;flex:none;margin-top:6px}
+.verdict.ok .dot{background:var(--ok)}
+.verdict.warn .dot{background:var(--warn)}
+.verdict.bad .dot{background:var(--bad)}
+.verdict strong{display:block;font-size:15.5px;margin-bottom:2px}
+.verdict p{margin:0;font-size:13.5px;color:var(--ink-2)}
+
+/* ─────────────────────────  SECTION  ───────────────────────── */
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.sec-head h2{
+  margin:0;font-family:"Big Shoulders Display",sans-serif;font-weight:700;
+  font-size:27px;letter-spacing:.02em;text-transform:uppercase;line-height:1;
+}
+.sec-head .hint{font-size:12.5px;color:var(--ink-3)}
+
+/* stat tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.tile{background:var(--surface);padding:14px 15px;display:flex;flex-direction:column;gap:4px}
+.tile .k{font-size:11.5px;color:var(--ink-3);letter-spacing:.02em;display:flex;align-items:center;gap:5px}
+.tile .v{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:20px;font-weight:600;letter-spacing:-.02em}
+.tile .s{font-size:11.5px;color:var(--ink-3)}
+.tile.hero{background:var(--surface-2)}
+.tile.hero .v{font-size:27px}
+.v.ok{color:var(--ok)} .v.warn{color:var(--warn)} .v.bad{color:var(--bad)}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+  padding:2px 7px;border-radius:99px;letter-spacing:.02em;
+}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* waterfall */
+.wf{display:flex;height:34px;border-radius:7px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2)}
+.wf span{
+  display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  font-weight:600;color:#fff;overflow:hidden;white-space:nowrap;transition:flex-basis .18s ease;
+}
+.wf .c1{background:var(--ink-2)}
+.wf .c2{background:var(--line-strong);color:var(--ink)}
+.wf .c3{background:var(--ok)}
+.wf .c4{background:var(--bad)}
+.wf-key{display:flex;gap:16px;flex-wrap:wrap;margin-top:9px;font-size:12px;color:var(--ink-2)}
+.wf-key i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:6px}
+
+/* comparison */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+@media (max-width:520px){.compare{grid-template-columns:1fr}}
+.compare>div{background:var(--surface);padding:14px 15px}
+.compare .k{font-size:11.5px;color:var(--ink-3)}
+.compare .v{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600}
+
+/* chart */
+.chart{display:flex;flex-direction:column;gap:7px}
+.crow{display:grid;grid-template-columns:82px minmax(0,1fr) 92px;align-items:center;gap:10px}
+.crow .lbl{font-size:12.5px;color:var(--ink-2);text-align:right}
+.crow.active .lbl{color:var(--ink);font-weight:600}
+.track{display:grid;height:22px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.bar-n{justify-self:end;height:100%;background:var(--bad);border-radius:3px 0 0 3px}
+.bar-p{justify-self:start;height:100%;background:var(--accent);border-radius:0 3px 3px 0}
+.crow.active .bar-p{background:var(--ok)}
+.crow .amt{font-family:"IBM Plex Mono",monospace;font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums}
+.zero{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;margin-top:2px}
+
+/* price options */
+.prices{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.pcard{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:15px;display:flex;flex-direction:column;gap:9px;text-align:left;cursor:pointer;
+  transition:.14s;font:inherit;color:inherit;
+}
+.pcard:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+.pcard[data-best="1"][data-tone="ok"]{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok) inset}
+.pcard[data-cur="1"]{background:var(--accent-soft)}
+.pcard .p{font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;letter-spacing:-.02em}
+.pcard .rows{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--ink-2)}
+.pcard .rows div{display:flex;justify-content:space-between;gap:8px}
+.pcard .rows b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
+.pcard .apply{font-size:11.5px;color:var(--accent);font-weight:600}
+
+/* fleet */
+.fleet-ctl{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 18px;border-bottom:1px solid var(--line)}
+@media (max-width:620px){.fleet-ctl{grid-template-columns:1fr}}
+
+/* recommendation */
+.reco{border:1px solid var(--accent);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.reco-head{
+  background:var(--accent);color:var(--accent-ink);padding:12px 18px;
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+}
+.reco-head span{font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:22px;
+  text-transform:uppercase;letter-spacing:.03em}
+.reco-head small{font-size:12px;opacity:.85}
+.reco-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line)}
+.reco-body>div{background:var(--surface);padding:15px}
+.reco-body .k{font-size:11.5px;color:var(--ink-3);margin-bottom:3px}
+.reco-body .v{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600}
+.reco-foot{padding:13px 18px;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink-2)}
+.reco-foot button{font:inherit;color:var(--accent);font-weight:600;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--ink-3);line-height:1.6}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="pole" aria-hidden="true"></div>
+    <div class="brand">
+      <div class="eyebrow">ADPG &middot; Ferramenta de decisão</div>
+      <h1><span class="disp">Simulador de Assinatura</span></h1>
+    </div>
+    <p class="top-note">Mexa em qualquer valor. Tudo recalcula na hora — inclusive o risco de o cliente usar mais do que você previu.</p>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="grid">
+
+  <!-- ─────────── CONTROLES ─────────── -->
+  <aside class="panel">
+    <div class="card">
+      <div class="step-head"><span class="step-n">1</span><h2>Dados da barbearia</h2></div>
+      <div class="fields">
+        <div class="field">
+          <label for="precoCorte">Preço do corte</label>
+          <div class="inputbox"><span class="pre">R$</span><input id="precoCorte" type="number" min="1" step="1" value="50"><span class="suf">/un</span></div>
+        </div>
+        <div class="field">
+          <label for="comissao">Comissão do colaborador</label>
+          <div class="slider-row"><span class="slider-val" id="comissaoOut">40%</span><span class="num" style="font-size:12px;color:var(--ink-3)" id="comissaoRS">R$ 20,00 por corte</span></div>
+          <input id="comissao" type="range" min="0" max="70" step="1" value="40">
+        </div>
+        <div class="field">
+          <label for="custoVar">Custo variável por corte <span style="color:var(--ink-3)">(produtos, lavanderia)</span></label>
+          <div class="inputbox"><span class="pre">R$</span><input id="custoVar" type="number" min="0" step="0.5" value="5"><span class="suf">/un</span></div>
+        </div>
+        <div class="field">
+          <label for="custosFixos">Custos fixos mensais</label>
+          <div class="inputbox"><span class="pre">R$</span><input id="custosFixos" type="number" min="0" step="100" value="8000"><span class="suf">/mês</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step-head"><span class="step-n">2</span><h2>Monte sua assinatura</h2></div>
+      <div class="fields">
+        <div class="field">
+          <label for="precoPlano">Preço da assinatura</label>
+          <div class="inputbox"><span class="pre">R$</span><input id="precoPlano" type="number" min="1" step="1" value="89.90"><span class="suf">/mês</span></div>
+        </div>
+        <div class="field">
+          <label>Cortes inclusos por mês</label>
+          <div class="stepper">
+            <button type="button" id="cMinus" aria-label="Menos um corte">&minus;</button>
+            <div class="segs" id="segs" role="group" aria-label="Cortes por mês"></div>
+            <button type="button" id="cPlus" aria-label="Mais um corte">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─────────── RESULTADOS ─────────── -->
+  <main class="results">
+
+    <div class="verdict" id="verdict" role="status" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span>
+      <div><strong id="vTitle"></strong><p id="vText"></p></div>
+    </div>
+
+    <section>
+      <div class="sec-head"><h2>Resultado por cliente</h2><span class="hint" id="perClientHint"></span></div>
+      <div class="tiles" id="tiles"></div>
+
+      <div style="margin-top:16px">
+        <div class="wf" id="wf"></div>
+        <div class="wf-key">
+          <span><i style="background:var(--ink-2)"></i>Colaborador</span>
+          <span><i style="background:var(--line-strong)"></i>Custos variáveis</span>
+          <span id="wfKey3"><i style="background:var(--ok)"></i>Lucro da barbearia</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>O que muda para o cliente</h2></div>
+      <div class="compare">
+        <div><div class="k">Pagando corte a corte</div><div class="v num" id="cAvulso"></div><div class="k" id="cAvulsoSub"></div></div>
+        <div><div class="k">Na assinatura</div><div class="v num" id="cPlano"></div><div class="k" id="cEconomia"></div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Lucro × utilização</h2><span class="hint">O risco mora aqui: e se ele usar mais?</span></div>
+      <div class="card card-pad">
+        <div class="chart" id="chart"></div>
+        <div class="zero" id="chartNote"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Qual preço devo cobrar?</h2><span class="hint">Clique em um cenário para aplicar</span></div>
+      <div class="prices" id="prices"></div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Simule sua base de assinantes</h2></div>
+      <div class="card">
+        <div class="fleet-ctl">
+          <div class="field">
+            <label for="assinantes">Quantidade de assinantes</label>
+            <div class="stepper">
+              <button type="button" id="aMinus" aria-label="Menos assinantes">&minus;</button>
+              <div class="inputbox" style="flex:1"><input id="assinantes" type="number" min="1" step="10" value="100"><span class="suf">assinantes</span></div>
+              <button type="button" id="aPlus" aria-label="Mais assinantes">+</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="uso">Uso médio real por assinante</label>
+            <div class="slider-row"><span class="slider-val" id="usoOut">2,0 cortes</span><span class="num" style="font-size:12px;color:var(--ink-3)" id="usoPct"></span></div>
+            <input id="uso" type="range" min="0" max="2" step="0.1" value="2">
+          </div>
+        </div>
+        <div class="reco-body" id="fleet" style="border-top:0"></div>
+        <div class="reco-foot" id="fleetFoot"></div>
+      </div>
+    </section>
+
+    <section class="reco" id="reco">
+      <div class="reco-head"><span>O ADPG recomenda</span><small id="recoWhy"></small></div>
+      <div class="reco-body" id="recoBody"></div>
+      <div class="reco-foot" id="recoFoot"></div>
+    </section>
+
+    <footer>
+      Estimativas gerenciais para apoiar a decisão de preço. O lucro por assinante é a contribuição depois da comissão e dos custos variáveis — os custos fixos já existem hoje e são cobertos pelo conjunto da operação. Impostos, taxa de cartão e inadimplência não estão incluídos.
+    </footer>
+  </main>
+</div>
+</div>
+
+<script src="src/calculo.js"></script>
+<script>
+"use strict";
+/* ---------------------------------------------------------------------------
+   Camada de interface. Toda regra de negócio está em src/calculo.js (ADPG.*).
+   Aqui só se lê input, formata número e desenha.
+   --------------------------------------------------------------------------- */
+const $ = id => document.getElementById(id);
+const brl = n => (n<0?"-":"") + Math.abs(n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const pct = n => n.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1}) + "%";
+const dec = n => n.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
+const int = n => Math.round(n).toLocaleString("pt-BR");
+const clamp = ADPG.clamp;
+
+const estado = { cortes: 2, usoTocado: false };
+
+function parametros(){
+  return ADPG.normalizar({
+    precoCorte:  $("precoCorte").value,
+    comissaoPct: $("comissao").value,
+    custoVar:    $("custoVar").value,
+    custosFixos: $("custosFixos").value
+  });
+}
+const plural = (n, s, p) => n === 1 ? s : p;
+
+/* ═══════════════ RENDER: chamado a cada alteração de qualquer input ═══════════════ */
+function render(){
+  const p = parametros();
+  const precoPlano = Math.max(1, +$("precoPlano").value || 0);
+  estado.cortes = clamp(estado.cortes, 1, ADPG.CFG.MAX_CORTES);
+  const N = estado.cortes;
+
+  /* ── controles ── */
+  $("comissaoOut").textContent = p.comissaoPct + "%";
+  $("comissaoRS").textContent = brl(p.comissaoCorte) + " por corte";
+
+  const segs = $("segs");
+  const visiveis = [1,2,3,4];
+  if (N > 4) visiveis.push(N);
+  segs.innerHTML = "";
+  visiveis.forEach(n => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = n;
+    b.setAttribute("aria-pressed", n === N ? "true" : "false");
+    b.onclick = () => { estado.cortes = n; estado.usoTocado = false; render(); };
+    segs.appendChild(b);
+  });
+  $("cMinus").disabled = N <= 1;
+  $("cPlus").disabled = N >= ADPG.CFG.MAX_CORTES;
+
+  /* o uso médio acompanha o plano até o usuário mexer no slider */
+  const usoEl = $("uso");
+  usoEl.max = N;
+  usoEl.step = N <= 2 ? 0.1 : 0.25;
+  if (!estado.usoTocado) usoEl.value = N;
+  const uso = clamp(+usoEl.value, 0, N);
+  $("usoOut").textContent = dec(uso) + plural(uso, " corte", " cortes");
+  $("usoPct").textContent = pct(N ? uso/N*100 : 0) + " do plano";
+
+  const c    = ADPG.cenario(p, precoPlano, N);
+  const cRisco = ADPG.cenario(p, precoPlano, N + 1);
+  const k    = ADPG.classificar(c, cRisco);
+
+  /* ── veredito ── */
+  $("verdict").className = "verdict " + k.tom;
+  $("vTitle").textContent =
+    k.tom === "ok"   ? "Plano saudável" :
+    k.tom === "warn" ? "Atenção nessa configuração" : "Essa configuração não se paga";
+  $("vText").textContent =
+    `Com ${N} ${plural(N,"corte","cortes")} usados, sobram ${brl(c.lucro)} por assinante ` +
+    `(${pct(c.margem*100)} de margem). ${k.texto}`;
+
+  /* ── resultado por cliente ── */
+  const tomLucro = c.lucro < 0 ? "bad" : c.margem < ADPG.CFG.MARGEM_ACEITAVEL ? "warn" : "ok";
+  $("tiles").innerHTML = [
+    tile("💳 Cliente paga", brl(c.preco), "por mês, use ou não"),
+    tile("✂️ Colaborador recebe", brl(c.comissao), `${p.comissaoPct}% × ${N} ${plural(N,"corte","cortes")}`),
+    tile("🏪 Barbearia fica", brl(c.fica), "antes dos custos variáveis"),
+    tile("🧾 Custos variáveis", brl(c.variaveis), `${brl(p.custoVar)} × ${N}`),
+    tile("💰 Lucro estimado", brl(c.lucro), `margem de ${pct(c.margem*100)}`, tomLucro, true)
+  ].join("");
+  $("perClientHint").textContent = `no cenário de ${N} ${plural(N,"corte","cortes")}/mês`;
+
+  /* ── barra de composição do que o cliente paga ── */
+  const base = Math.max(c.preco, c.comissao + c.variaveis);
+  const faixa = (valor, classe, rotulo) => valor <= 0 ? "" :
+    `<span class="${classe}" style="flex:0 0 ${(valor/base*100).toFixed(2)}%">${valor/base > .13 ? rotulo : ""}</span>`;
+  $("wf").innerHTML =
+    faixa(c.comissao, "c1", brl(c.comissao)) +
+    faixa(c.variaveis, "c2", brl(c.variaveis)) +
+    (c.lucro >= 0 ? faixa(c.lucro, "c3", brl(c.lucro)) : faixa(-c.lucro, "c4", brl(c.lucro)));
+  $("wfKey3").innerHTML = c.lucro >= 0
+    ? '<i style="background:var(--ok)"></i>Lucro da barbearia'
+    : '<i style="background:var(--bad)"></i>Prejuízo';
+
+  /* ── comparação para o cliente ── */
+  $("cAvulso").textContent = brl(c.avulso);
+  $("cAvulsoSub").textContent = `${N} × ${brl(p.precoCorte)}`;
+  $("cPlano").textContent = brl(c.preco);
+  $("cEconomia").innerHTML =
+    c.economia > 0  ? `<span class="chip ok">🎉 Economiza ${brl(c.economia)} · ${pct(c.economiaPct*100)}</span>` :
+    c.economia === 0 ? `<span class="chip warn">Mesmo valor do avulso</span>` :
+                       `<span class="chip bad">Paga ${brl(-c.economia)} a mais que no avulso</span>`;
+
+  /* ── gráfico lucro × utilização ── */
+  const linhas = ADPG.curvaDeUtilizacao(p, precoPlano, Math.max(4, N + 2));
+  const maxPos = Math.max(0, ...linhas.map(l => l.lucro));
+  const maxNeg = Math.max(0, ...linhas.map(l => -l.lucro));
+  const total  = maxPos + maxNeg || 1;
+  const colNeg = maxNeg / total * 100, colPos = 100 - colNeg;
+  const dentro = (valor, coluna) => (coluna > 0 && valor > 0) ? (valor/coluna*100).toFixed(2) : "0";
+  $("chart").innerHTML = linhas.map(l => {
+    const ativo = l.uso === N;
+    const w = Math.abs(l.lucro) / total * 100;
+    const barras = l.lucro >= 0
+      ? `<div class="bar-n" style="width:0"></div><div class="bar-p" style="width:${dentro(w, colPos)}%"></div>`
+      : `<div class="bar-n" style="width:${dentro(w, colNeg)}%"></div><div class="bar-p" style="width:0"></div>`;
+    return `<div class="crow ${ativo?"active":""}">
+      <div class="lbl">${l.uso} ${plural(l.uso,"corte","cortes")}${ativo?" ·":""}</div>
+      <div class="track" style="grid-template-columns:${colNeg.toFixed(2)}% ${colPos.toFixed(2)}%">${barras}</div>
+      <div class="amt" style="color:${l.lucro<0?"var(--bad)":"var(--ink)"}">${brl(l.lucro)}</div>
+    </div>`;
+  }).join("");
+  const limite = ADPG.limiteDeUso(p, precoPlano);
+  $("chartNote").textContent = limite >= 1
+    ? `Custo direto de ${brl(p.custoDireto)} por corte. Esse preço sustenta até ${limite} ${plural(limite,"corte","cortes")} por mês; a partir do ${limite+1}º o assinante dá prejuízo.`
+    : `Custo direto de ${brl(p.custoDireto)} por corte — acima do preço da assinatura. Todo assinante dá prejuízo.`;
+
+  /* ── qual preço devo cobrar ── */
+  const { opcoes, melhorIndice } = ADPG.opcoesDePreco(p, N);
+  $("prices").innerHTML = opcoes.map((o, i) => {
+    const atual = Math.abs(o.preco - precoPlano) < 0.005;
+    const destaque = i === melhorIndice && o.classificacao.tom === "ok";
+    return `
+    <button class="pcard" type="button" data-p="${o.preco}"
+      data-best="${i===melhorIndice?1:0}" data-tone="${o.classificacao.tom}" data-cur="${atual?1:0}">
+      <div class="p">${brl(o.preco)}</div>
+      <span class="chip ${o.classificacao.tom}">${destaque ? "★ Recomendado" : o.classificacao.rotulo}</span>
+      <div class="rows">
+        <div><span>Lucro/assinante</span><b style="color:${o.cenario.lucro<0?"var(--bad)":"inherit"}">${brl(o.cenario.lucro)}</b></div>
+        <div><span>Margem</span><b>${pct(o.cenario.margem*100)}</b></div>
+        <div><span>Desconto ao cliente</span><b>${o.cenario.economiaPct>0?pct(o.cenario.economiaPct*100):"—"}</b></div>
+      </div>
+      <div class="apply">${atual ? "Preço atual" : "Aplicar este preço →"}</div>
+    </button>`;
+  }).join("");
+  document.querySelectorAll(".pcard").forEach(b => b.onclick = () => {
+    $("precoPlano").value = (+b.dataset.p).toFixed(2); render();
+  });
+
+  /* ── base de assinantes ── */
+  const base_ = ADPG.projetarBase(p, precoPlano, +$("assinantes").value || 1, uso);
+  $("fleet").innerHTML = [
+    fcell("Receita recorrente", brl(base_.receita) + "<span style='font-size:12px;color:var(--ink-3)'>/mês</span>"),
+    fcell("Colaboradores recebem", brl(base_.comissoes)),
+    fcell("Custos variáveis", brl(base_.variaveis)),
+    fcell("Contribuição para a barbearia", brl(base_.contribuicao), base_.contribuicao<0?"bad":"ok")
+  ].join("");
+  $("fleetFoot").innerHTML = base_.contribuicao <= 0
+    ? "Nessa configuração a base de assinantes <b>não gera contribuição</b> — quanto mais assinantes, maior o rombo."
+    : `Cobre <b>${pct(clamp(base_.coberturaFixos,0,99)*100)}</b> dos ${brl(p.custosFixos)} de custos fixos. ` +
+      (base_.assinantesParaCobrirFixos
+        ? `Seriam necessários <b>${int(base_.assinantesParaCobrirFixos)} assinantes</b> com esse uso médio para bancar sozinha toda a estrutura fixa.`
+        : "");
+
+  /* ── o ADPG recomenda ── */
+  const r = ADPG.recomendar(p);
+  $("recoWhy").textContent = "melhor equilíbrio entre margem, desconto e risco de uso";
+  $("recoBody").innerHTML = [
+    fcell("💈 Cortes por mês", int(r.cortes)),
+    fcell("💰 Preço da assinatura", brl(r.preco)),
+    fcell("👤 Economia do cliente", pct(Math.max(0, r.cenario.economiaPct)*100)),
+    fcell("✂️ Remuneração do colaborador", brl(r.cenario.comissao)),
+    fcell("🏪 Lucro por assinante", brl(r.cenario.lucro)),
+    fcell("📊 Margem estimada", pct(r.cenario.margem*100), r.classificacao.tom)
+  ].join("");
+  const igual = r.cortes === N && Math.abs(r.preco - precoPlano) < 0.005;
+  $("recoFoot").innerHTML =
+    `<span class="chip ${r.classificacao.tom}">${r.classificacao.rotulo}</span> &nbsp;` +
+    (igual
+      ? "É exatamente a configuração que você montou acima."
+      : `Sua configuração atual é ${N} ${plural(N,"corte","cortes")} a ${brl(precoPlano)}. ` +
+        `<button type="button" id="applyReco">Aplicar a recomendação</button>`);
+  const aplicar = $("applyReco");
+  if (aplicar) aplicar.onclick = () => {
+    estado.cortes = r.cortes; estado.usoTocado = false;
+    $("precoPlano").value = r.preco.toFixed(2); render();
+  };
+}
+
+function tile(rotulo, valor, sub, tom, hero){
+  return `<div class="tile ${hero?"hero":""}"><div class="k">${rotulo}</div>
+    <div class="v ${tom||""}">${valor}</div><div class="s">${sub||""}</div></div>`;
+}
+function fcell(rotulo, valor, tom){
+  return `<div><div class="k">${rotulo}</div><div class="v ${tom||""}">${valor}</div></div>`;
+}
+
+/* ── qualquer alteração recalcula tudo ── */
+["precoCorte","comissao","custoVar","custosFixos","precoPlano","assinantes"]
+  .forEach(id => $(id).addEventListener("input", render));
+$("uso").addEventListener("input", () => { estado.usoTocado = true; render(); });
+$("cMinus").onclick = () => { estado.cortes--; estado.usoTocado = false; render(); };
+$("cPlus").onclick  = () => { estado.cortes++; estado.usoTocado = false; render(); };
+$("aMinus").onclick = () => { $("assinantes").value = Math.max(1, (+$("assinantes").value||1) - 10); render(); };
+$("aPlus").onclick  = () => { $("assinantes").value = (+$("assinantes").value||0) + 10; render(); };
+
+render();
+</script>
+</body>
+</html>

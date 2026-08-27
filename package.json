@@ -1,0 +1,11 @@
+{
+  "name": "simulador-assinatura-adpg",
+  "version": "0.1.0",
+  "description": "Simulador de planos de assinatura para barbearias - protótipo e especificação da regra de negócio (ADPG)",
+  "private": true,
+  "main": "src/calculo.js",
+  "scripts": {
+    "test": "node testes/casos.js"
+  },
+  "license": "UNLICENSED"
+}
