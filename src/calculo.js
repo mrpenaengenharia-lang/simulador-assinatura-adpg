@@ -4,11 +4,11 @@
  * Funções puras, sem DOM e sem dependências. Toda a regra de negócio do
  * simulador vive aqui — a interface (index.html) só formata e desenha.
  *
- * Uso no navegador:   <script src="src/calculo.js"></script>  →  window.ADPG
+ * Uso no navegador:   tag script apontando para src/calculo.js  →  window.ADPG
  * Uso no Node:        const ADPG = require("./src/calculo.js");
  *
  * A especificação escrita destas regras está em docs/ESPECIFICACAO.md e os
- * valores esperados de cada função estão em docs/CASOS-DE-TESTE.md.
+ * valores esperados de cada função estão em testes/casos.js.
  */
 (function (raiz) {
   "use strict";
