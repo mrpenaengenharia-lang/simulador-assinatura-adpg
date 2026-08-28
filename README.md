@@ -70,15 +70,16 @@ docs/ESPECIFICACAO-COMBOS.md    Regra de negócio dos combos
 
 ### Tela de combos
 
-| Seção | O que resolve |
+Três perguntas, uma resposta. Tudo o que não é decisão fica escondido atrás de "Ajustar meus preços".
+
+| Passo | O que pergunta |
 |---|---|
-| **Seus serviços** | Preço, tempo, custo de material e comissão de cada serviço; qual é o carro-chefe |
-| **Monte o combo** | Quais serviços entram e por quanto; preço e desconto são o mesmo controle |
-| **Comissão do colaborador** | Quem absorve o desconto &mdash; a barbearia sozinha ou dividido. Mostra quanto vale a escolha |
-| **Resultado por combo** | Quanto entra, quanto sai, quanto tempo de cadeira custa |
-| **O teste da cadeira** | Lucro por hora do combo contra o carro-chefe. É aqui que o combo se decide |
-| **Até quanto posso descontar** | A faixa de desconto que ainda mantém a margem saudável |
-| **O ADPG recomenda** | O preço que fecha a conta &mdash; ou o motivo de não fechar e o que mexer |
+| **1. O que entra no combo?** | Serviços em botões grandes, com preço e tempo já preenchidos |
+| **2. Por quanto você vende?** | Preço e desconto no mesmo controle |
+| **3. O barbeiro ganha em cima de quê?** | Duas opções mostrando o valor em reais de cada uma |
+| **A resposta** | Uma frase grande: *pode vender* / *só com a cadeira vazia* / *dá prejuízo* — e o porquê em linguagem de barbearia |
+| **Três números** | Quanto você lucra, quanto sobra de cada R$ 100, quanto tempo prende a cadeira |
+| **A sugestão** | O melhor preço para esse combo, clicável — ou o motivo de não existir preço que feche |
 
 ---
 

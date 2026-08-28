@@ -17,132 +17,94 @@
     <div class="pole" aria-hidden="true"></div>
     <div class="brand">
       <div class="eyebrow">ADPG &middot; Ferramenta de decisão</div>
-      <h1><span class="disp">Simulador de Combos</span></h1>
+      <h1><span class="disp">Esse combo vale a pena?</span></h1>
     </div>
-    <p class="top-note">Um combo aumenta o ticket e ocupa a cadeira por mais tempo. Aqui você vê se ele compensa &mdash; e em qual horário.</p>
   </div>
 </header>
 
 <div class="wrap">
+<div class="solo">
 
-  <!-- ─────────── 1. SERVIÇOS ─────────── -->
-  <section class="card" style="margin-bottom:22px">
-    <div class="step-head"><span class="step-n">1</span><h2>Seus serviços</h2></div>
-    <div style="padding:12px 18px 18px">
+  <!-- ─────────── 1 ─────────── -->
+  <section class="passo">
+    <h2>O que entra no combo?</h2>
+    <p class="sub">Toque nos serviços.</p>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <!-- ─────────── 2 ─────────── -->
+  <section class="passo">
+    <h2>Por quanto você vende?</h2>
+    <p class="sub" id="sub2">&nbsp;</p>
+    <div class="preco-linha">
+      <span class="preco-de" id="precoDe"></span>
+      <div class="preco-cx"><span>R$</span><input id="preco" type="number" min="0" step="1" value="69.90" aria-label="Preço do combo"></div>
+      <span class="preco-off" id="off"></span>
+    </div>
+    <input id="slider" type="range" min="0" max="45" step="1" value="18" aria-label="Desconto">
+  </section>
+
+  <!-- ─────────── 3 ─────────── -->
+  <section class="passo">
+    <h2>O barbeiro ganha em cima de quê?</h2>
+    <p class="sub">Quando tem desconto, os dois valores mudam.</p>
+    <div class="duas" id="duas">
+      <button type="button" class="escolha" data-b="cheio">
+        <b>Do preço normal</b>
+        <span class="val" id="valCheio"></span>
+        <small>a barbearia banca o desconto sozinha</small>
+      </button>
+      <button type="button" class="escolha" data-b="combo">
+        <b>Do preço do combo</b>
+        <span class="val" id="valCombo"></span>
+        <small>vocês dois dividem o desconto</small>
+      </button>
+    </div>
+  </section>
+
+  <!-- ─────────── A RESPOSTA ─────────── -->
+  <section class="resposta" id="resposta" role="status" aria-live="polite">
+    <div class="selo" id="selo"></div>
+    <h2 id="titulo"></h2>
+    <p id="linha1"></p>
+    <p id="linha2"></p>
+  </section>
+
+  <div class="fatos" id="fatos"></div>
+
+  <div class="sugestao" id="sugestao"></div>
+
+  <!-- ─────────── AVANÇADO ─────────── -->
+  <details class="adv">
+    <summary>Ajustar meus preços, tempos e comissões</summary>
+    <div class="adv-corpo">
+      <h3>Meus serviços</h3>
       <div class="svc-wrap">
         <div class="svc head">
-          <span class="c">No combo</span>
           <span>Serviço</span>
           <span class="c">Preço</span>
           <span class="c">Tempo</span>
-          <span class="c">Custo</span>
+          <span class="c">Material</span>
           <span class="c">Comissão</span>
-          <span class="c">Carro-chefe</span>
+          <span class="c">No combo</span>
           <span></span>
         </div>
         <div id="lista"></div>
       </div>
       <button type="button" class="svc-add" id="addSvc">+ Adicionar serviço</button>
-      <p class="svc-legend">
-        <b>Custo</b> é o que você gasta de produto e material naquele serviço.
-        <b>Carro-chefe</b> é o serviço que mais enche a sua agenda &mdash; é ele que a cadeira deixa de fazer quando você vende um combo, e por isso ele é a régua de comparação.
-      </p>
+      <p class="adv-nota"><b>Material</b> é o que você gasta de produto naquele serviço.</p>
+
+      <h3>Qual serviço mais enche a sua agenda?</h3>
+      <select class="adv-sel" id="chefe"></select>
+      <p class="adv-nota">É a régua da comparação: no horário cheio, cada combo que você vende ocupa a cadeira de um desses.</p>
     </div>
-  </section>
+  </details>
 
-  <div class="grid">
-
-    <!-- ─────────── 2. O COMBO ─────────── -->
-    <aside class="panel">
-      <div class="card">
-        <div class="step-head"><span class="step-n">2</span><h2>Monte o combo</h2></div>
-        <div class="fields">
-          <div class="field">
-            <label for="precoCombo">Preço do combo</label>
-            <div class="inputbox"><span class="pre">R$</span><input id="precoCombo" type="number" min="0" step="1" value="69.90"></div>
-          </div>
-          <div class="field">
-            <label>Desconto que isso representa</label>
-            <div class="slider-row">
-              <span class="slider-val" id="descOut">&mdash;</span>
-              <span class="num" style="font-size:12px;color:var(--ink-3)" id="descRS">&mdash;</span>
-            </div>
-            <input id="desconto" type="range" min="0" max="40" step="1" value="18">
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="step-head"><span class="step-n">3</span><h2>Comissão do colaborador</h2></div>
-        <div class="fields">
-          <p style="margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.5">
-            Quando você dá desconto no combo, quem absorve esse desconto?
-          </p>
-          <div class="opts" id="opts">
-            <button type="button" class="opt" data-b="cheio">
-              <b>A barbearia absorve sozinha</b>
-              <small>O colaborador recebe sobre o preço de tabela, como se não houvesse combo.</small>
-            </button>
-            <button type="button" class="opt" data-b="combo">
-              <b>Barbearia e colaborador dividem</b>
-              <small>O colaborador recebe sobre o valor que o cliente realmente pagou.</small>
-            </button>
-          </div>
-          <div class="opt-impact" id="optImpact"></div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- ─────────── RESULTADOS ─────────── -->
-    <main class="results">
-
-      <div class="verdict" id="verdict" role="status" aria-live="polite">
-        <span class="dot" aria-hidden="true"></span>
-        <div><strong id="vTitle"></strong><p id="vText"></p></div>
-      </div>
-
-      <section>
-        <div class="sec-head"><h2>Resultado por combo</h2><span class="hint" id="hint"></span></div>
-        <div class="tiles" id="tiles"></div>
-        <div style="margin-top:16px">
-          <div class="wf" id="wf"></div>
-          <div class="wf-key">
-            <span><i style="background:var(--ink-2)"></i>Colaborador</span>
-            <span><i style="background:var(--line-strong)"></i>Custos</span>
-            <span id="wfKey3"><i style="background:var(--ok)"></i>Lucro da barbearia</span>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div class="sec-head"><h2>O teste da cadeira</h2><span class="hint">é aqui que o combo se decide</span></div>
-        <div class="card card-pad">
-          <div class="vs" id="vs"></div>
-          <p class="verdict-hora" id="vsTexto"></p>
-        </div>
-      </section>
-
-      <section>
-        <div class="sec-head"><h2>Até quanto posso descontar</h2></div>
-        <div class="card card-pad">
-          <div class="gauge" id="gauge"></div>
-          <div class="gauge-ends"><span>sem desconto</span><span id="gaugeMax"></span></div>
-          <p style="margin:14px 0 0;font-size:13.5px;color:var(--ink-2);line-height:1.55" id="gaugeTexto"></p>
-        </div>
-      </section>
-
-      <section class="reco" id="reco">
-        <div class="reco-head"><span>O ADPG recomenda</span><small id="recoWhy"></small></div>
-        <div class="reco-body" id="recoBody"></div>
-        <div class="reco-foot" id="recoFoot"></div>
-      </section>
-
-      <footer>
-        Estimativas gerenciais para apoiar a decisão de preço do combo. O lucro é a contribuição depois da comissão e dos custos de material &mdash; os custos fixos da barbearia já existem e são cobertos pela operação inteira. Impostos, taxa de cartão e no-show não estão incluídos.
-        <br><a href="index.html" style="color:var(--accent);font-weight:600">&larr; Simulador de assinatura</a>
-      </footer>
-    </main>
-  </div>
+  <footer class="rodape-solo">
+    Estimativa gerencial. O lucro mostrado é o que sobra depois da comissão e do material &mdash; aluguel, luz e salários já existem e são cobertos pela operação inteira. Impostos e taxa de cartão não estão incluídos.
+    <br><a href="index.html" style="color:var(--accent);font-weight:600">&larr; Simulador de assinatura</a>
+  </footer>
+</div>
 </div>
 
 <script src="src/calculo.js"></script>
@@ -150,17 +112,17 @@
 <script>
 "use strict";
 /* ---------------------------------------------------------------------------
-   Camada de interface. Toda regra de negócio está em src/combos.js (COMBO.*).
+   Interface. Toda regra de negócio está em src/combos.js (COMBO.*).
    --------------------------------------------------------------------------- */
 const $ = id => document.getElementById(id);
 const brl = n => (n<0?"-":"") + Math.abs(n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-const pct = n => n.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1}) + "%";
+const pct = n => Math.round(n) + "%";
 const dec = n => n.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 const estado = {
   base: "cheio",
-  ultimoCampo: "preco",   // "preco" ou "desconto" - qual dos dois o dono mexeu por último
+  ultimo: "preco",
   servicos: [
     {nome:"Corte",       preco:50, minutos:40, custoVar:5, comissaoPct:40, incluso:true,  carroChefe:true},
     {nome:"Barba",       preco:35, minutos:25, custoVar:4, comissaoPct:40, incluso:true,  carroChefe:false},
@@ -169,203 +131,182 @@ const estado = {
   ]
 };
 
-/* ═══════════════ lista de serviços ═══════════════ */
+/* ═══════════════ chips (passo 1) ═══════════════ */
+function desenharChips(){
+  $("chips").innerHTML = estado.servicos.map((s,i) => `
+    <button type="button" class="chip-svc" data-i="${i}" aria-pressed="${s.incluso}">
+      <b>${esc(s.nome)}</b><span>${brl(s.preco)} &middot; ${s.minutos} min</span>
+    </button>`).join("");
+  $("chips").querySelectorAll(".chip-svc").forEach(b => b.onclick = () => {
+    const s = estado.servicos[+b.dataset.i];
+    s.incluso = !s.incluso;
+    estado.ultimo = "desconto";   // mantém o desconto ao trocar os serviços
+    desenharChips(); render();
+  });
+}
+
+/* ═══════════════ avançado ═══════════════ */
 function desenharLista(){
   $("lista").innerHTML = estado.servicos.map((s,i) => `
     <div class="svc" data-i="${i}">
-      <div class="mid"><input type="checkbox" data-k="incluso" ${s.incluso?"checked":""} aria-label="Incluir ${esc(s.nome)} no combo"></div>
       <input type="text" data-k="nome" value="${esc(s.nome)}" aria-label="Nome do serviço">
-      <div class="mini"><span>R$</span><input type="number" data-k="preco" min="0" step="1" value="${s.preco}" aria-label="Preço"></div>
-      <div class="mini"><input type="number" data-k="minutos" min="1" step="5" value="${s.minutos}" aria-label="Tempo em minutos"><span>min</span></div>
-      <div class="mini"><span>R$</span><input type="number" data-k="custoVar" min="0" step="0.5" value="${s.custoVar}" aria-label="Custo de material"></div>
-      <div class="mini"><input type="number" data-k="comissaoPct" min="0" max="90" step="1" value="${s.comissaoPct}" aria-label="Comissão"><span>%</span></div>
-      <div class="mid"><input type="radio" name="chefe" data-k="carroChefe" ${s.carroChefe?"checked":""} aria-label="${esc(s.nome)} é o carro-chefe"></div>
+      <div class="mini"><span>R$</span><input type="number" data-k="preco" min="0" step="1" value="${s.preco}" aria-label="Preço de ${esc(s.nome)}"></div>
+      <div class="mini"><input type="number" data-k="minutos" min="1" step="5" value="${s.minutos}" aria-label="Tempo de ${esc(s.nome)}"><span>min</span></div>
+      <div class="mini"><span>R$</span><input type="number" data-k="custoVar" min="0" step="0.5" value="${s.custoVar}" aria-label="Material de ${esc(s.nome)}"></div>
+      <div class="mini"><input type="number" data-k="comissaoPct" min="0" max="90" step="1" value="${s.comissaoPct}" aria-label="Comissão de ${esc(s.nome)}"><span>%</span></div>
+      <div class="mid"><input type="checkbox" data-k="incluso" ${s.incluso?"checked":""} aria-label="Incluir ${esc(s.nome)} no combo"></div>
       <button type="button" class="del" data-del="${i}" aria-label="Remover ${esc(s.nome)}" title="Remover">&times;</button>
     </div>`).join("");
 
   $("lista").querySelectorAll("[data-k]").forEach(el => {
     const i = +el.closest(".svc").dataset.i, k = el.dataset.k;
-    const ev = el.type === "checkbox" || el.type === "radio" ? "change" : "input";
-    el.addEventListener(ev, () => {
-      if (k === "carroChefe") estado.servicos.forEach((s,j) => s.carroChefe = (j === i));
-      else if (k === "incluso") estado.servicos[i].incluso = el.checked;
+    el.addEventListener(el.type === "checkbox" ? "change" : "input", () => {
+      if (k === "incluso") estado.servicos[i].incluso = el.checked;
       else if (k === "nome") estado.servicos[i].nome = el.value;
       else estado.servicos[i][k] = +el.value;
-      if (k === "carroChefe" || k === "nome") desenharLista();
-      estado.ultimoCampo = "preco";
+      estado.ultimo = "desconto";
+      desenharChips(); desenharChefe();
+      if (k === "incluso") desenharLista();
       render();
     });
   });
   $("lista").querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
     if (estado.servicos.length <= 2) return;
-    const i = +b.dataset.del;
-    const eraChefe = estado.servicos[i].carroChefe;
+    const i = +b.dataset.del, eraChefe = estado.servicos[i].carroChefe;
     estado.servicos.splice(i,1);
     if (eraChefe) estado.servicos[0].carroChefe = true;
-    desenharLista(); render();
+    desenharChips(); desenharLista(); desenharChefe(); render();
   });
 }
+function desenharChefe(){
+  $("chefe").innerHTML = estado.servicos.map((s,i) =>
+    `<option value="${i}" ${s.carroChefe?"selected":""}>${esc(s.nome)}</option>`).join("");
+}
+$("chefe").onchange = () => {
+  const i = +$("chefe").value;
+  estado.servicos.forEach((s,j) => s.carroChefe = (j === i));
+  render();
+};
 $("addSvc").onclick = () => {
   estado.servicos.push({nome:"Novo serviço", preco:30, minutos:20, custoVar:3, comissaoPct:40, incluso:false, carroChefe:false});
-  desenharLista(); render();
+  desenharChips(); desenharLista(); desenharChefe(); render();
 };
-$("opts").querySelectorAll(".opt").forEach(b => b.onclick = () => {
-  estado.base = b.dataset.b; render();
-});
-$("precoCombo").addEventListener("input", () => { estado.ultimoCampo = "preco"; render(); });
-$("desconto").addEventListener("input", () => { estado.ultimoCampo = "desconto"; render(); });
+$("duas").querySelectorAll(".escolha").forEach(b => b.onclick = () => { estado.base = b.dataset.b; render(); });
+$("preco").addEventListener("input", () => { estado.ultimo = "preco"; render(); });
+$("slider").addEventListener("input", () => { estado.ultimo = "desconto"; render(); });
 
 /* ═══════════════ render ═══════════════ */
 function render(){
   const servicos = COMBO.normalizarServicos(estado.servicos);
   const ref = COMBO.referencia(servicos);
-  const somaAvulso = servicos.filter(s => s.incluso).reduce((t,s) => t + s.preco, 0);
+  const soma = servicos.filter(s => s.incluso).reduce((t,s) => t + s.preco, 0);
 
-  /* preço e desconto são dois jeitos de dizer a mesma coisa: o que o dono
-     mexeu por último manda, o outro acompanha */
+  /* preço e desconto são o mesmo controle: o último mexido manda */
   let preco;
-  if (estado.ultimoCampo === "desconto" && somaAvulso > 0){
-    preco = somaAvulso * (1 - (+$("desconto").value)/100);
-    $("precoCombo").value = preco.toFixed(2);
+  if (estado.ultimo === "desconto" && soma > 0){
+    preco = Math.round(soma * (1 - (+$("slider").value)/100) * 100) / 100;
+    $("preco").value = preco.toFixed(2);
   } else {
-    preco = Math.max(0, +$("precoCombo").value || 0);
-    $("desconto").value = somaAvulso > 0 ? Math.round(Math.max(0,(somaAvulso-preco)/somaAvulso*100)) : 0;
+    preco = Math.max(0, +$("preco").value || 0);
+    $("slider").value = soma > 0 ? Math.round(Math.max(0,(soma-preco)/soma*100)) : 0;
   }
 
   const a = COMBO.analisar(servicos, preco, estado.base);
   const op = COMBO.oportunidade(a, ref);
   const k = COMBO.classificar(a, ref);
   const dif = COMBO.diferencaDeBase(servicos, preco);
-  const L = COMBO.limites(servicos, estado.base, ref);
+  const poucos = a.quantidade < 2;
 
-  $("descOut").textContent = a.somaAvulso > 0 ? pct(a.descontoPct*100) : "—";
-  $("descRS").textContent = a.somaAvulso > 0
-    ? brl(a.desconto) + " sobre " + brl(a.somaAvulso) : "selecione os serviços";
+  /* passo 2 */
+  $("sub2").innerHTML = poucos ? "&nbsp;"
+    : "Separado, esses serviços custam " + brl(a.somaAvulso) + ".";
+  $("precoDe").innerHTML = poucos ? "" : `de <s>${brl(a.somaAvulso)}</s> por`;
+  $("off").textContent = poucos ? "" : (a.desconto > 0 ? pct(a.descontoPct*100) + " off" : "sem desconto");
+  $("off").className = "preco-off" + (a.desconto > 0 ? "" : " zero");
 
-  $("opts").querySelectorAll(".opt").forEach(b =>
+  /* passo 3 */
+  $("valCheio").textContent = brl(dif.cheio.comissao);
+  $("valCombo").textContent = brl(dif.combo.comissao);
+  $("duas").querySelectorAll(".escolha").forEach(b =>
     b.setAttribute("aria-pressed", b.dataset.b === estado.base ? "true" : "false"));
-  $("optImpact").innerHTML = a.quantidade < 2 ? "Escolha os serviços do combo acima." :
-    (Math.abs(dif.diferencaLucro) < 0.005
-      ? "Sem desconto, as duas opções dão no mesmo."
-      : `Essa escolha vale <b>${brl(Math.abs(dif.diferencaLucro))}</b> por combo. ` +
-        `Dividindo com o colaborador, a barbearia lucra <b>${brl(dif.combo.lucro)}</b> e ele recebe <b>${brl(dif.combo.comissao)}</b>. ` +
-        `Absorvendo sozinha, a barbearia lucra <b>${brl(dif.cheio.lucro)}</b> e ele recebe <b>${brl(dif.cheio.comissao)}</b>.`);
 
-  /* ── veredito ── */
-  $("verdict").className = "verdict " + k.tom;
-  $("vTitle").textContent = k.rotulo;
-  $("vText").textContent = a.quantidade < 2 ? k.texto
-    : `${a.quantidade} serviços, ${a.minutos} minutos de cadeira, ${brl(a.lucro)} de lucro ` +
-      `(${pct(a.margem*100)} de margem). ${k.texto}`;
+  /* ── a resposta ── */
+  const r = $("resposta");
+  r.className = "resposta " + k.tom;
+  const nomeRef = ref ? ref.servico.nome.toLowerCase() : "corte";
 
-  /* ── tiles ── */
-  const tomLucro = a.lucro < 0 ? "bad" : a.margem < COMBO.CFG.MARGEM_ACEITAVEL ? "warn" : "ok";
-  $("tiles").innerHTML = [
-    tile("Cliente paga", brl(a.preco), `avulso seria ${brl(a.somaAvulso)}`),
-    tile("Colaborador recebe", brl(a.comissao), estado.base === "combo" ? "sobre o valor do combo" : "sobre o valor cheio"),
-    tile("Custos de material", brl(a.custoVar), `${a.quantidade} serviços`),
-    tile("Tempo de cadeira", a.minutos + " min", dec(a.horas) + " hora" + (a.horas === 1 ? "" : "s")),
-    tile("Lucro do combo", brl(a.lucro), `margem de ${pct(a.margem*100)}`, tomLucro, true)
+  if (poucos){
+    $("selo").textContent = "falta escolher";
+    $("titulo").textContent = "Escolha dois serviços";
+    $("linha1").textContent = "Toque nos serviços lá em cima para montar o combo.";
+    $("linha2").textContent = "";
+  } else if (k.tom === "bad" && a.lucro <= 0){
+    $("selo").textContent = "não venda isso";
+    $("titulo").textContent = "Esse combo dá prejuízo";
+    $("linha1").innerHTML = `A cada combo vendido você <b>perde ${brl(-a.lucro)}</b>: o cliente paga ${brl(a.preco)}, o barbeiro leva ${brl(a.comissao)} e o material custa ${brl(a.custoVar)}.`;
+    $("linha2").innerHTML = `Para não perder dinheiro, o mínimo é <b>${brl(a.comissao + a.custoVar)}</b>.`;
+  } else if (k.rotulo === "Margem baixa"){
+    $("selo").textContent = "arriscado";
+    $("titulo").textContent = "Sobra pouco demais";
+    $("linha1").innerHTML = `Você lucra <b>${brl(a.lucro)}</b> num combo de ${brl(a.preco)} — só ${pct(a.margem*100)}. Qualquer imprevisto come esse lucro.`;
+    $("linha2").innerHTML = op ? `E ainda ocupa a cadeira ${a.minutos} minutos.` : "";
+  } else if (k.rotulo === "Sem vantagem"){
+    $("selo").textContent = "o cliente não vai levar";
+    $("titulo").textContent = "Falta desconto";
+    $("linha1").innerHTML = `Separado sai ${brl(a.somaAvulso)}, no combo ${brl(a.preco)}. São só ${brl(a.desconto)} de diferença — o cliente não vê motivo para trocar.`;
+    $("linha2").innerHTML = `Para o combo ter graça, desconte pelo menos <b>${brl(a.somaAvulso*0.05)}</b>.`;
+  } else if (k.tom === "warn"){
+    $("selo").textContent = "depende da hora";
+    $("titulo").textContent = "Só com a cadeira vazia";
+    $("linha1").innerHTML = `Você lucra <b>${brl(a.lucro)}</b>, mas o combo prende a cadeira por <b>${a.minutos} minutos</b>. ` +
+      `Nesse tempo entrariam <b>${dec(op.cabem)} ${esc(nomeRef)}s</b>, que dariam <b>${brl(op.renderiam)}</b>.`;
+    $("linha2").innerHTML = `<b>No horário parado, venda:</b> ali a cadeira renderia zero, então ${brl(a.lucro)} é dinheiro que não existiria. <b>No movimento, não ofereça</b> — você troca ${brl(op.renderiam)} por ${brl(a.lucro)}.`;
+  } else {
+    $("selo").textContent = "pode vender";
+    $("titulo").textContent = "Esse combo vale a pena";
+    $("linha1").innerHTML = `Você lucra <b>${brl(a.lucro)}</b> em ${a.minutos} minutos de cadeira. ` +
+      `No mesmo tempo, ${dec(op.cabem)} ${esc(nomeRef)}s dariam ${brl(op.renderiam)} — o combo rende <b>${brl(op.diferenca)} a mais</b>.`;
+    $("linha2").innerHTML = `E o cliente ainda economiza ${brl(a.desconto)}. <b>Pode oferecer em qualquer horário.</b>`;
+  }
+
+  /* três números, nada além disso */
+  $("fatos").style.display = poucos ? "none" : "";
+  $("fatos").innerHTML = poucos ? "" : [
+    fato("Você lucra", brl(a.lucro), a.lucro < 0 ? "bad" : a.margem < 0.25 ? "warn" : "ok"),
+    fato("De cada R$ 100, sobram", "R$ " + Math.round(a.margem*100), null),
+    fato("Prende a cadeira", a.minutos + " min", null)
   ].join("");
-  $("hint").textContent = a.quantidade >= 2
-    ? a.servicos.map(s => s.nome).join(" + ") : "";
 
-  /* ── barra de composição ── */
-  const bruto = Math.max(a.preco, a.comissao + a.custoVar);
-  const faixa = (v, cls, rot) => v <= 0 ? "" :
-    `<span class="${cls}" style="flex:0 0 ${(v/bruto*100).toFixed(2)}%">${v/bruto > .13 ? rot : ""}</span>`;
-  $("wf").innerHTML = faixa(a.comissao,"c1",brl(a.comissao)) + faixa(a.custoVar,"c2",brl(a.custoVar)) +
-    (a.lucro >= 0 ? faixa(a.lucro,"c3",brl(a.lucro)) : faixa(-a.lucro,"c4",brl(a.lucro)));
-  $("wfKey3").innerHTML = a.lucro >= 0
-    ? '<i style="background:var(--ok)"></i>Lucro da barbearia'
-    : '<i style="background:var(--bad)"></i>Prejuízo';
-
-  /* ── o teste da cadeira ── */
-  if (!ref || a.quantidade < 2 || a.horas <= 0){
-    $("vs").innerHTML = "";
-    $("vsTexto").textContent = "Escolha os serviços do combo e marque o seu carro-chefe para ver esta comparação.";
+  /* ── sugestão de preço ── */
+  const rec = COMBO.recomendar(servicos, estado.base, ref);
+  if (poucos){
+    $("sugestao").style.display = "none";
   } else {
-    const ganha = a.lucroHora >= ref.lucroHora;
-    const teto = Math.max(a.lucroHora, ref.lucroHora, 0.01);
-    const linha = (rot, valor, sub, hero, tom) => `
-      <div class="vsrow ${hero?"hero":""} ${tom||""}">
-        <div class="lbl">${rot}<br><span style="font-size:11px;color:var(--ink-3)">${sub}</span></div>
-        <div class="vsbar"><i style="width:${Math.max(0,valor)/teto*100}%"></i></div>
-        <div class="amt">${brl(valor)}/h</div>
-      </div>`;
-    $("vs").innerHTML =
-      linha("Este combo", a.lucroHora, `${brl(a.lucro)} em ${a.minutos} min`, true, ganha?"ok":"bad") +
-      linha(esc(ref.servico.nome) + " sozinho", ref.lucroHora,
-            `${brl(ref.lucro)} em ${ref.servico.minutos} min`, false);
-    $("vsTexto").innerHTML = ganha
-      ? `No tempo desse combo cabem <b>${dec(op.cabem)}</b> ${esc(ref.servico.nome.toLowerCase())}s, que renderiam ${brl(op.renderiam)}. ` +
-        `O combo rende <b>${brl(a.lucro)}</b> &mdash; ${brl(op.diferenca)} a mais. <b>Pode vender em qualquer horário.</b>`
-      : `No tempo desse combo cabem <b>${dec(op.cabem)}</b> ${esc(ref.servico.nome.toLowerCase())}s, que renderiam ${brl(op.renderiam)}. ` +
-        `O combo rende <b>${brl(a.lucro)}</b> &mdash; ${brl(Math.abs(op.diferenca))} a menos. ` +
-        `<b>Na agenda vazia é lucro puro; no horário de pico ele ocupa a cadeira de algo que rende mais.</b>`;
-  }
-
-  /* ── até quanto posso descontar ── */
-  const maxPct = Math.max(0, Math.min(1, L.descontoMaximoPct));
-  const atual = Math.max(0, Math.min(1, a.descontoPct));
-  const escala = Math.max(maxPct, atual, 0.05) * 1.15;
-  $("gauge").innerHTML =
-    `<div class="safe" style="width:${maxPct/escala*100}%"></div>` +
-    `<div class="mark" data-l="você: ${pct(atual*100)}" style="left:${Math.min(97,atual/escala*100)}%"></div>`;
-  $("gaugeMax").textContent = pct(escala*100);
-  $("gaugeTexto").innerHTML = a.quantidade < 2 ? "Monte o combo para ver o limite."
-    : maxPct <= 0
-      ? `Com essa comissão e esses custos, <b>não sobra espaço para desconto nenhum</b> mantendo a margem saudável.`
-      : `A faixa verde é o desconto que ainda mantém <b>${pct(COMBO.CFG.MARGEM_SAUDAVEL*100)} de margem</b>: ` +
-        `até <b>${pct(maxPct*100)}</b>, ou seja, preço mínimo de <b>${brl(L.pisoMargem)}</b>. ` +
-        (atual > maxPct ? `Você está <b style="color:var(--bad)">acima do limite</b>.` : `Você está dentro dele.`);
-
-  /* ── recomendação ── */
-  const r = COMBO.recomendar(servicos, estado.base, ref);
-  if (a.quantidade < 2){
-    $("recoWhy").textContent = "";
-    $("recoBody").innerHTML = fcell("Monte o combo", "&mdash;");
-    $("recoFoot").textContent = "Escolha pelo menos dois serviços acima.";
-  } else if (r.viavel){
-    const ra = r.analise;
-    $("recoWhy").textContent = "menor preço que mantém a margem e ainda ganha da cadeira";
-    $("recoBody").innerHTML = [
-      fcell("Preço do combo", brl(r.preco)),
-      fcell("Desconto ao cliente", pct(Math.max(0,ra.descontoPct)*100)),
-      fcell("Lucro por combo", brl(ra.lucro)),
-      fcell("Margem", pct(ra.margem*100)),
-      fcell("Lucro por hora", brl(ra.lucroHora), r.classificacao.tom)
-    ].join("");
-    $("recoFoot").innerHTML = `<span class="chip ${r.classificacao.tom}">${r.classificacao.rotulo}</span> &nbsp;` +
-      (Math.abs(r.preco - a.preco) < 0.005
-        ? "É exatamente o preço que você montou."
-        : `Seu preço atual é ${brl(a.preco)}. <button type="button" id="aplicar">Aplicar ${brl(r.preco)}</button>`);
-    const ap = $("aplicar");
-    if (ap) ap.onclick = () => { $("precoCombo").value = r.preco.toFixed(2); estado.ultimoCampo = "preco"; render(); };
-  } else {
-    $("recoWhy").textContent = "este combo não fecha a conta";
-    $("recoBody").innerHTML = [
-      fcell("Preço que seria necessário", r.preco ? brl(r.preco) : "&mdash;", "bad"),
-      fcell("Máximo com desconto real", brl(L.teto)),
-      fcell("Desconto que ainda cabe", pct(Math.max(0, (L.somaAvulso - L.pisoCadeira) / (L.somaAvulso||1)) * 100))
-    ].join("");
-    const alternativa = estado.base === "cheio"
-      ? ` Dividir o desconto com o colaborador recupera ${brl(Math.abs(dif.diferencaLucro))} por combo e encurta essa distância.`
-      : "";
-    $("recoFoot").innerHTML = `<span class="chip bad">Não fecha</span> &nbsp;${r.texto}${alternativa} ` +
-      `Ainda assim ele funciona como <b>combo de horário ocioso</b>: naquela hora a cadeira renderia zero, então ${brl(a.lucro)} é lucro que não existiria.`;
+    $("sugestao").style.display = "";
+    if (rec.viavel && Math.abs(rec.preco - a.preco) < 0.005){
+      $("sugestao").innerHTML = `<b>${brl(rec.preco)}</b> é o melhor preço para esse combo. É exatamente o que você colocou.`;
+    } else if (rec.viavel){
+      $("sugestao").innerHTML = `O melhor preço para esse combo é <b>${brl(rec.preco)}</b> — ` +
+        `aí ele vale em qualquer horário e o cliente ainda economiza ${brl(rec.analise.desconto)}. ` +
+        `<button type="button" id="aplicar">Usar esse preço</button>`;
+      $("aplicar").onclick = () => { $("preco").value = rec.preco.toFixed(2); estado.ultimo = "preco"; render(); };
+    } else {
+      $("sugestao").innerHTML = `Não existe preço que faça esse combo valer no horário cheio: ` +
+        `teria que custar <b>${brl(rec.preco)}</b>, mais do que os serviços separados. ` +
+        (estado.base === "cheio"
+          ? `Se o barbeiro ganhar sobre o preço do combo, você recupera ${brl(Math.abs(dif.diferencaLucro))} por venda.`
+          : `Dá para melhorar baixando a comissão do serviço agregado, lá embaixo.`);
+    }
   }
 }
 
-function tile(rotulo, valor, sub, tom, hero){
-  return `<div class="tile ${hero?"hero":""}"><div class="k">${rotulo}</div>
-    <div class="v ${tom||""}">${valor}</div><div class="s">${sub||""}</div></div>`;
-}
-function fcell(rotulo, valor, tom){
-  return `<div><div class="k">${rotulo}</div><div class="v ${tom||""}">${valor}</div></div>`;
+function fato(rotulo, valor, tom){
+  return `<div class="fato"><div class="k">${rotulo}</div><div class="v ${tom||""}">${valor}</div></div>`;
 }
 
+desenharChips();
 desenharLista();
+desenharChefe();
 render();
 </script>
 </body>

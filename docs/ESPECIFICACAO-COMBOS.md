@@ -172,14 +172,15 @@ Ou seja: as alavancas do dono são **reduzir o desconto**, **reduzir a comissão
 
 ## 9. Comportamentos da interface
 
-- Recálculo total a cada tecla; preço e desconto são espelhos um do outro.
-- A escolha da base de comissão mostra os dois cenários com números, lado a lado, antes de decidir.
-- Serviços podem ser adicionados e removidos; o mínimo é 2 na lista.
-- Remover o carro-chefe promove o primeiro serviço restante — nunca fica sem referência.
-- Valores vazios ou inválidos caem no mínimo. A tela nunca quebra nem mostra `NaN`.
-- Quando o combo não fecha, a tela nunca dá só um "não": mostra o preço que seria necessário, o quanto de desconto ainda cabe e a alternativa do horário ocioso.
+A tela é deliberadamente enxuta: **três perguntas e uma resposta**. Toda a configuração fina (preços, tempos, materiais, comissões, carro-chefe) fica fechada atrás de um `<details>` — chega preenchida e o dono só abre se quiser mexer.
 
----
+- **Recálculo total a cada toque.** Não existe botão "calcular".
+- **Preço e desconto são o mesmo controle**, visto de dois jeitos. O último mexido manda; o outro acompanha. Trocar os serviços do combo preserva o **desconto**, não o preço — é o que o dono espera ao montar variações.
+- **A escolha da comissão mostra os dois valores em reais**, não a teoria. O dono lê "R$ 34,00" contra "R$ 27,96" e decide.
+- **A resposta é uma frase, não um painel.** Seis redações possíveis, uma por situação: escolha dois serviços / dá prejuízo / sobra pouco demais / falta desconto / só com a cadeira vazia / pode vender.
+- **Nunca é só um "não".** Quando o combo não fecha, a tela diz o preço que seria necessário e qual alavanca mexer — e lembra que ele ainda serve para horário parado.
+- **Só três números** abaixo da resposta: quanto lucra, quanto sobra de cada R$ 100, quanto tempo prende a cadeira. O resto é ruído para quem está decidindo.
+- Valores vazios ou inválidos caem no mínimo. A tela nunca quebra nem mostra `NaN`.
 
 ## 10. Fora do escopo
 
