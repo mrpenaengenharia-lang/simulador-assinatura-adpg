@@ -1,8 +1,17 @@
-# Simulador de Assinatura ADPG
+# Simuladores ADPG para barbearias
 
-Ferramenta de decisão para o dono de barbearia montar um plano de assinatura e enxergar, na hora, se ele se paga.
+Duas ferramentas de decisão para o dono de barbearia, na mesma base de código:
 
-O dono mexe em qualquer valor — preço do corte, comissão, custo variável, custos fixos, preço da assinatura, quantidade de cortes — e **tudo recalcula em tempo real**: margem por cliente, risco de o cliente usar mais do que o previsto, preço recomendado e projeção da base de assinantes.
+| Tela | A pergunta que responde |
+|---|---|
+| [`index.html`](index.html) &mdash; **Assinatura** | Esse plano se paga? E se o cliente usar mais do que eu previ? |
+| [`combos.html`](combos.html) &mdash; **Combos** | Esse combo compensa? E em qual horário? |
+
+Em ambas, o dono mexe em qualquer valor e **tudo recalcula em tempo real**. Nenhuma tem botão "calcular".
+
+**Assinatura** — o risco é o cliente *usar demais*: um plano saudável com 2 cortes pode dar prejuízo com 4. Mostra margem por cliente, a curva inteira de utilização, preço recomendado e projeção da base de assinantes.
+
+**Combos** — o risco é o combo *ocupar a cadeira demais*: ele aumenta o ticket e pode derrubar o lucro por hora. Mostra o teste da cadeira (quantos carros-chefe caberiam naquele tempo e quanto renderiam), até onde dá para descontar e o preço recomendado.
 
 > Este repositório é o **protótipo funcional + a especificação da regra de negócio**. A ideia é que sirva de referência para a implementação dentro do ADPG, não que seja o código final de produção.
 
@@ -17,10 +26,10 @@ Não tem build, não tem dependência. Abra o `index.html` no navegador.
 npx serve .
 ```
 
-Para rodar os testes da regra de negócio:
+Para rodar os testes das duas regras de negócio (109 casos):
 
 ```bash
-node testes/casos.js
+npm test
 ```
 
 ---
@@ -28,18 +37,24 @@ node testes/casos.js
 ## Estrutura
 
 ```
-index.html              Protótipo completo (interface + estilos)
-src/calculo.js          Motor de cálculo — funções puras, sem DOM, sem dependências
-testes/casos.js         52 casos de teste com os números esperados
-docs/ESPECIFICACAO.md   A regra de negócio escrita: fórmulas, limites e semáforo
+index.html                      Tela da assinatura
+combos.html                     Tela dos combos
+src/estilo.css                  Estilos compartilhados pelas duas telas
+src/calculo.js                  Motor da assinatura - funções puras, sem DOM
+src/combos.js                   Motor dos combos - funções puras, sem DOM
+testes/casos.js                 52 casos com os números esperados da assinatura
+testes/casos-combos.js          57 casos com os números esperados dos combos
+docs/ESPECIFICACAO.md           Regra de negócio da assinatura
+docs/ESPECIFICACAO-COMBOS.md    Regra de negócio dos combos
 ```
 
-**A separação é proposital.** Toda a regra de negócio está em `src/calculo.js` e nada mais.
-O `index.html` só lê input, formata número e desenha. Para portar para React, Vue, Livewire ou o que for, o arquivo a traduzir é `calculo.js` — e `testes/casos.js` prova que a tradução ficou correta.
+**A separação é proposital.** Toda a regra de negócio está em `src/calculo.js` e `src/combos.js`, e em nenhum outro lugar. As telas só leem input, formatam número e desenham. Para portar para React, Vue, Livewire ou o que for, os arquivos a traduzir são esses dois — e as suítes de teste provam que a tradução ficou correta.
 
 ---
 
-## O que a tela faz
+## O que as telas fazem
+
+### Tela de assinatura
 
 | Seção | O que resolve |
 |---|---|
@@ -53,9 +68,23 @@ O `index.html` só lê input, formata número e desenha. Para portar para React,
 | **Base de assinantes** | Receita recorrente, contribuição e quanto cobre dos custos fixos |
 | **O ADPG recomenda** | O plano de melhor equilíbrio entre margem, desconto e risco |
 
+### Tela de combos
+
+| Seção | O que resolve |
+|---|---|
+| **Seus serviços** | Preço, tempo, custo de material e comissão de cada serviço; qual é o carro-chefe |
+| **Monte o combo** | Quais serviços entram e por quanto; preço e desconto são o mesmo controle |
+| **Comissão do colaborador** | Quem absorve o desconto &mdash; a barbearia sozinha ou dividido. Mostra quanto vale a escolha |
+| **Resultado por combo** | Quanto entra, quanto sai, quanto tempo de cadeira custa |
+| **O teste da cadeira** | Lucro por hora do combo contra o carro-chefe. É aqui que o combo se decide |
+| **Até quanto posso descontar** | A faixa de desconto que ainda mantém a margem saudável |
+| **O ADPG recomenda** | O preço que fecha a conta &mdash; ou o motivo de não fechar e o que mexer |
+
 ---
 
-## Os três conceitos que sustentam tudo
+## Os conceitos que sustentam tudo
+
+### Assinatura
 
 1. **Custo direto por corte** = comissão do colaborador + custo variável.
    É o que sai do caixa toda vez que o assinante aparece. No exemplo padrão: R$ 20 + R$ 5 = **R$ 25**.
@@ -65,11 +94,22 @@ O `index.html` só lê input, formata número e desenha. Para portar para React,
 
 3. **Risco de utilização.** O plano pode ser saudável com 2 cortes e dar prejuízo com 4. Por isso o simulador nunca mostra um número só — mostra a curva inteira e avisa a partir de quantos cortes o assinante vira despesa.
 
+### Combos
+
+1. **Lucro por hora de cadeira** = lucro do combo ÷ tempo que ele ocupa a cadeira.
+   É a única unidade que permite comparar coisas de durações diferentes.
+
+2. **Carro-chefe** = o serviço que mais enche a agenda. É a régua: no horário de pico, cada hora vendida em combo é uma hora que deixou de vender carro-chefe.
+
+3. **Quem absorve o desconto.** A comissão pode incidir sobre o preço de tabela ou sobre o valor que o cliente pagou. No exemplo padrão isso muda o lucro em R$ 6,04 por combo — é a variável mais pesada da tela, e a decisão é do dono.
+
+> **O achado que a ferramenta entrega:** corte + barba a R$ 69,90 sobe o ticket de R$ 50 para R$ 69,90 e **derruba** o lucro por hora de R$ 37,50 para R$ 24,83. No tempo desse combo cabem 1,63 cortes, que renderiam R$ 40,63 — contra R$ 26,90 do combo. Ele é um instrumento de **horário ocioso**, não de pico.
+
 ---
 
 ## Configuração da regra de negócio
 
-Os parâmetros do que o ADPG considera "saudável" estão isolados no objeto `CFG`, no topo de `src/calculo.js`:
+Os parâmetros do que o ADPG considera "saudável" estão isolados no objeto `CFG`, no topo de cada motor. Na assinatura (`src/calculo.js`):
 
 | Constante | Padrão | O que significa |
 |---|---|---|
@@ -79,6 +119,8 @@ Os parâmetros do que o ADPG considera "saudável" estão isolados no objeto `CF
 | `MARGEM_SAUDAVEL` | 40% | A partir daqui o semáforo fica verde |
 | `MARGEM_ACEITAVEL` | 25% | Abaixo daqui fica vermelho |
 | `DESCONTO_MINIMO` | 3% | Menos que isso e o cliente não vê motivo para assinar |
+
+Nos combos (`src/combos.js`): `MARGEM_SAUDAVEL` 40%, `MARGEM_ACEITAVEL` 25%, `DESCONTO_MINIMO` 5%, `TETO_ATRATIVIDADE` 95%.
 
 Se o ADPG tiver benchmarks próprios de mercado, muda-se só o `CFG` — nada mais no código precisa ser tocado.
 
@@ -95,6 +137,8 @@ Coisas que ficaram deliberadamente de fora do protótipo e que precisam de decis
 - [ ] **Salvar/carregar cenários** por barbearia dentro do ADPG.
 - [ ] **Exportar em PDF** o resultado para o dono levar para a reunião.
 - [ ] Validar o `MARGEM_ALVO` de 45% contra o benchmark real do ADPG.
+- [ ] **Tempo de limpeza entre atendimentos** — hoje o tempo de cadeira do combo é a soma pura dos serviços.
+- [ ] **Combo dentro da assinatura** — a combinação das duas ferramentas.
 
 ---
 
