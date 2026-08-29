@@ -142,6 +142,19 @@
       <div class="reco-foot" id="recoFoot"></div>
     </section>
 
+    <!-- Ligação com o resto do ADPG. No protótipo o botão não faz nada;
+         no sistema é aqui que o plano é criado e a cobrança recorrente ligada. -->
+    <section>
+      <div class="cta">
+        <div class="txt">
+          <b>Criar esse plano no ADPG</b>
+          <span id="ctaResumo"></span>
+        </div>
+        <button type="button" id="ctaBtn">Criar plano &rarr;</button>
+      </div>
+      <p class="cta-nota" id="ctaNota"><b>Protótipo:</b> este botão marca onde a calculadora se liga à cobrança recorrente do ADPG. O plano seria criado já com esse preço e essa quantidade de cortes, sem o dono digitar nada de novo.</p>
+    </section>
+
     <footer>
       Estimativas gerenciais para apoiar a decisão de preço. O lucro por assinante é a contribuição depois da comissão e dos custos variáveis — os custos fixos já existem hoje e são cobertos pelo conjunto da operação. Impostos, taxa de cartão e inadimplência não estão incluídos.
       <br><a href="combos.html" style="color:var(--accent);font-weight:600">Simulador de combos &rarr;</a>
@@ -316,6 +329,9 @@ function render(){
         ? `Seriam necessários <b>${int(base_.assinantesParaCobrirFixos)} assinantes</b> com esse uso médio para bancar sozinha toda a estrutura fixa.`
         : "");
 
+  /* ── ligação com o ADPG (protótipo) ── */
+  $("ctaResumo").textContent = `${brl(precoPlano)}/mês · ${N} ${plural(N,"corte","cortes")} inclusos`;
+
   /* ── o ADPG recomenda ── */
   const r = ADPG.recomendar(p);
   $("recoWhy").textContent = "melhor equilíbrio entre margem, desconto e risco de uso";
@@ -348,6 +364,13 @@ function tile(rotulo, valor, sub, tom, hero){
 function fcell(rotulo, valor, tom){
   return `<div><div class="k">${rotulo}</div><div class="v ${tom||""}">${valor}</div></div>`;
 }
+
+/* no protótipo o botão só explica o que aconteceria no sistema */
+$("ctaBtn").onclick = () => {
+  $("ctaNota").innerHTML = "<b>No ADPG isto abriria a criação do plano</b> com esse preço e essa " +
+    "quantidade de cortes já preenchidos, e ligaria a cobrança recorrente no cartão dos assinantes. " +
+    "Aqui no protótipo o botão não faz nada.";
+};
 
 /* ── qualquer alteração recalcula tudo ── */
 ["precoCorte","comissao","custoVar","custosFixos","precoPlano","assinantes"]

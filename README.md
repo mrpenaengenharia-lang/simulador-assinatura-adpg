@@ -13,6 +13,8 @@ Em ambas, o dono mexe em qualquer valor e **tudo recalcula em tempo real**. Nenh
 
 **Combos** — o risco é o combo *ocupar a cadeira demais*: ele aumenta o ticket e pode derrubar o lucro por hora. Mostra o teste da cadeira (quantos carros-chefe caberiam naquele tempo e quanto renderiam), até onde dá para descontar e o preço recomendado.
 
+> **Antes de mexer em qualquer regra, leia [`docs/PRINCIPIOS.md`](docs/PRINCIPIOS.md).** São seis decisões de produto que valem mais que qualquer detalhe de implementação — a primeira delas é que o simulador fala a verdade mesmo quando a verdade desanima o dono.
+
 > Este repositório é o **protótipo funcional + a especificação da regra de negócio**. A ideia é que sirva de referência para a implementação dentro do ADPG, não que seja o código final de produção.
 
 ---
@@ -46,6 +48,7 @@ testes/casos.js                 52 casos com os números esperados da assinatura
 testes/casos-combos.js          57 casos com os números esperados dos combos
 docs/ESPECIFICACAO.md           Regra de negócio da assinatura
 docs/ESPECIFICACAO-COMBOS.md    Regra de negócio dos combos
+docs/PRINCIPIOS.md              Decisões de produto - leia antes de mudar comportamento
 ```
 
 **A separação é proposital.** Toda a regra de negócio está em `src/calculo.js` e `src/combos.js`, e em nenhum outro lugar. As telas só leem input, formatam número e desenham. Para portar para React, Vue, Livewire ou o que for, os arquivos a traduzir são esses dois — e as suítes de teste provam que a tradução ficou correta.

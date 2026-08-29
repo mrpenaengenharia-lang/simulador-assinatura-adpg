@@ -74,6 +74,18 @@
 
   <div class="sugestao" id="sugestao"></div>
 
+  <!-- Ligação com o resto do ADPG. No protótipo o botão não faz nada. -->
+  <section id="cta" style="margin-bottom:16px">
+    <div class="cta">
+      <div class="txt">
+        <b>Criar esse combo no ADPG</b>
+        <span id="ctaResumo"></span>
+      </div>
+      <button type="button" id="ctaBtn">Criar combo &rarr;</button>
+    </div>
+    <p class="cta-nota" id="ctaNota"><b>Protótipo:</b> este botão marca onde a calculadora se liga ao cadastro de serviços do ADPG. O combo seria criado já com esses serviços e esse preço.</p>
+  </section>
+
   <!-- ─────────── AVANÇADO ─────────── -->
   <details class="adv">
     <summary>Ajustar meus preços, tempos e comissões</summary>
@@ -192,6 +204,11 @@ $("addSvc").onclick = () => {
   desenharChips(); desenharLista(); desenharChefe(); render();
 };
 $("duas").querySelectorAll(".escolha").forEach(b => b.onclick = () => { estado.base = b.dataset.b; render(); });
+$("ctaBtn").onclick = () => {
+  $("ctaNota").innerHTML = "<b>No ADPG isto abriria o cadastro do combo</b> com esses serviços e esse " +
+    "preço já preenchidos, pronto para aparecer na comanda e no agendamento. " +
+    "Aqui no protótipo o botão não faz nada.";
+};
 $("preco").addEventListener("input", () => { estado.ultimo = "preco"; render(); });
 $("slider").addEventListener("input", () => { estado.ultimo = "desconto"; render(); });
 
@@ -276,6 +293,11 @@ function render(){
     fato("De cada R$ 100, sobram", "R$ " + Math.round(a.margem*100), null),
     fato("Prende a cadeira", a.minutos + " min", null)
   ].join("");
+
+  /* ── ligação com o ADPG (protótipo) ── */
+  $("cta").style.display = poucos ? "none" : "";
+  $("ctaResumo").textContent = poucos ? ""
+    : a.servicos.map(s => s.nome).join(" + ") + " · " + brl(a.preco);
 
   /* ── sugestão de preço ── */
   const rec = COMBO.recomendar(servicos, estado.base, ref);
